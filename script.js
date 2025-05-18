@@ -1,36 +1,27 @@
-// Function that returns a promise resolving with an array after a 3-second delay
-function getNumbers() {
+const outputDiv = document.getElementById('output');
+
+function delayedPromise(time, operation) {
     return new Promise((resolve) => {
         setTimeout(() => {
-            resolve([1, 2, 3, 4]);
-        }, 3000);
+            resolve(operation());
+        }, time);
     });
 }
 
-// Function that filters even numbers after a 1-second delay
-function filterEvenNumbers(numbers) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const evenNumbers = numbers.filter(num => num % 2 === 0);
-            document.getElementById('output').textContent = evenNumbers.join(", ");
-            resolve(evenNumbers);
-        }, 1000);
-    });
-}
+console.log("Script loaded successfully");
 
-// Function that multiplies numbers by 2 after a 2-second delay
-function multiplyByTwo(numbers) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const multipliedNumbers = numbers.map(num => num * 2);
-            document.getElementById('output').textContent = multipliedNumbers.join(", ");
-            resolve(multipliedNumbers);
-        }, 2000);
+// Start with an initial promise that resolves after 3 seconds
+delayedPromise(3000, () => [1, 2, 3, 4])
+    .then(numbers => {
+        console.log("Original Array:", numbers);
+        return delayedPromise(1000, () => numbers.filter(num => num % 2 === 0)); // Filter even numbers
+    })
+    .then(evenNumbers => {
+        console.log("Filtered Even Numbers:", evenNumbers);
+        outputDiv.innerText = evenNumbers.join(','); // Display [2, 4]
+        return delayedPromise(2000, () => evenNumbers.map(num => num * 2)); // Multiply by 2
+    })
+    .then(transformedNumbers => {
+        console.log("Doubled Numbers:", transformedNumbers);
+        outputDiv.innerText = transformedNumbers.join(','); // Display [4, 8]
     });
-}
-
-// Chaining promises to perform the transformations step by step
-getNumbers()
-    .then(filterEvenNumbers)
-    .then(multiplyByTwo)
-    .catch(error => console.error("Error:", error));
